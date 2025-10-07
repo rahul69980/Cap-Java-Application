@@ -1,6 +1,11 @@
-FROM openjdk:latest
-RUN npm install pom.xml
+FROM maven:latest AS builder
 WORKDIR /app
 COPY . .
+RUN mvn clean package
+FROM tomcat:latest
+
+
+COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+
 EXPOSE 8010
-CMD ["java","mavenwebappdeployement.yaml"]
+CMD ["catalina.sh", "run"]
